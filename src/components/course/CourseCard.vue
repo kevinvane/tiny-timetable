@@ -22,10 +22,13 @@ const emit = defineEmits<{
 <template>
   <div 
     class="course-card"
-    :style="{ backgroundColor: course.color + '20', borderColor: course.color }"
+    :style="{ backgroundColor: course.color + '20' }"
   >
     <div class="course-header">
-      <span class="course-name">{{ course.name }}</span>
+      <div class="course-title">
+        <span class="color-dot" :style="{ backgroundColor: course.color }"></span>
+        <span class="course-name">{{ course.name }}</span>
+      </div>
       <div v-if="showActions" class="course-actions">
         <el-button size="small" circle @click="emit('edit', course)">
           <el-icon><Edit /></el-icon>
@@ -57,8 +60,7 @@ const emit = defineEmits<{
 <style scoped>
 .course-card {
   padding: 12px;
-  border-radius: 8px;
-  border-left: 4px solid;
+  border-radius: 12px;
   margin-bottom: 8px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -74,6 +76,19 @@ const emit = defineEmits<{
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.course-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-dot {
+  width: 8px;
+  height: 28px;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .course-name {
