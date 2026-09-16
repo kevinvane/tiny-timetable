@@ -1,116 +1,135 @@
-# 中国小学生课程表 Web App
+<h1 align="center">📚 小学生课程表</h1>
 
-一个为小学生设计的课程表管理应用，支持课程安排、时间管理、提醒功能等。
+<p align="center">
+  一个为小学生设计的课程表管理 Web 应用
+</p>
 
-## 项目概述
+<p align="center">
+  <img src="https://img.shields.io/badge/Vue-3.5+-42b883?style=flat-square&logo=vue.js" alt="Vue">
+  <img src="https://img.shields.io/badge/Vite-8+-646CFF?style=flat-square&logo=vite" alt="Vite">
+  <img src="https://img.shields.io/badge/TypeScript-6.0+-3178C6?style=flat-square&logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Element_Plus-2.x-409EFF?style=flat-square" alt="Element Plus">
+  <img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=flat-square" alt="Apache License 2.0">
+</p>
 
-本项目是一个基于 Vue3 + Vite + TypeScript 的前端应用，旨在为小学生提供一个直观、易用的课程表管理工具。应用将支持多视图展示（周视图、日视图）、课程管理、提醒功能等。
+---
 
-## 技术栈
+## ✨ 功能特性
 
-- **前端框架**: Vue 3 (Composition API)
-- **构建工具**: Vite
-- **编程语言**: TypeScript
-- **状态管理**: Pinia
-- **路由**: Vue Router 4
-- **UI组件库**: Element Plus
-- **样式方案**: SCSS + CSS Variables
-- **日期处理**: Day.js
-- **图标**: @element-plus/icons-vue
+### 📅 课程表管理
+- **周视图 / 日视图** — 灵活切换查看一周或单日课程
+- **一键添加课程** — 点击空格位即可选择课程添加到课表
+- **打印支持** — 一键打印课程表，自动适配打印样式
 
-## 功能特性
+### 🎨 多主题支持
+- **6 套预设主题** — 珊瑚橙、海洋蓝、森林绿、薰衣紫、樱花粉、阳光橙
+- **深色模式** — 每套主题均适配深色模式
+- **实时切换** — 主题切换即时生效，无需刷新
 
-### 核心功能
-1. **课程表展示**
-   - 周视图：显示一周七天的课程安排
-   - 日视图：显示单日详细课程安排
-   - 时间轴展示：显示每节课的时间
+### ⚙️ 个性化设置
+- **自定义标题** — 修改应用名称，如「三年二班课程表」
+- **课程时间管理** — 自定义每节课的开始/结束时间
+- **字体大小** — 支持小 / 中 / 大三种字体
 
-2. **课程管理**
-   - 添加/编辑/删除课程
-   - 课程信息：名称、教师、教室、时间、颜色标签
-   - 课程分类（主科、副科、兴趣班等）
+### 📋 课程管理
+- **课程 CRUD** — 添加、编辑、删除课程
+- **课程分类** — 主科、副科、兴趣班、活动
+- **彩色标签** — 每门课程独立配色，直观区分
 
-3. **时间管理**
-   - 自定义上课时间
-   - 支持不同作息时间表
+### 🗂️ 数据持久化
+- 所有数据自动存储在浏览器 localStorage，刷新不丢失
 
-4. **个性化设置**
-   - 主题切换（浅色/深色模式）
-   - 自定义课程颜色
-   - 字体大小调整
+## 🛠️ 技术栈
 
-## 项目结构
+| 类别 | 技术 |
+|------|------|
+| 框架 | [Vue 3](https://vuejs.org/) (Composition API + `<script setup>`) |
+| 构建 | [Vite](https://vitejs.dev/) |
+| 语言 | [TypeScript](https://www.typescriptlang.org/) |
+| 状态管理 | [Pinia](https://pinia.vuejs.org/) |
+| 路由 | [Vue Router 4](https://router.vuejs.org/) |
+| UI 组件库 | [Element Plus](https://element-plus.org/) |
+| 图标 | [@element-plus/icons-vue](https://github.com/element-plus/element-plus-icons-vue) |
+| 日期处理 | [Day.js](https://day.js.org/) |
+
+## 📁 项目结构
 
 ```
 src/
-├── assets/              # 静态资源
-│   ├── images/
-│   └── styles/
-├── components/          # 公共组件
-│   ├── common/          # 通用组件
-│   ├── course/          # 课程相关组件
-│   └── schedule/        # 课程表相关组件
-├── composables/         # 组合式函数
-├── constants/           # 常量定义
-├── layouts/             # 布局组件
-├── router/              # 路由配置
-├── stores/              # Pinia 状态管理
-├── types/               # TypeScript 类型定义
-├── utils/               # 工具函数
-├── views/               # 页面组件
-│   ├── Home.vue
-│   ├── Schedule.vue
-│   ├── CourseManage.vue
-│   └── Settings.vue
-├── App.vue
-└── main.ts
+├── assets/styles/         # 全局样式 & 主题变量
+├── components/
+│   ├── course/            # 课程卡片、课程表单
+│   └── schedule/          # 课程表网格、时间轴
+├── composables/           # 组合式函数
+├── constants/             # 常量 & 预设主题
+├── router/                # 路由配置
+├── stores/                # Pinia 状态管理
+│   ├── course.ts          # 课程数据
+│   ├── schedule.ts        # 课程表数据
+│   └── settings.ts        # 设置 & 主题切换
+├── types/                 # TypeScript 类型定义
+├── utils/                 # 工具函数 (localStorage 等)
+├── views/
+│   ├── Home.vue           # 首页
+│   ├── Schedule.vue       # 课程表页
+│   ├── CourseManage.vue   # 课程管理页
+│   └── Settings.vue       # 设置页
+├── App.vue                # 根组件 (侧边栏布局)
+└── main.ts                # 入口文件
 ```
 
-## 安装与运行
+## 🚀 快速开始
 
 ### 环境要求
+
 - Node.js >= 18.0.0
 - npm >= 9.0.0
 
-### 安装依赖
-```bash
-npm install
-```
+### 安装 & 运行
 
-### 启动开发服务器
 ```bash
+# 克隆仓库
+git clone https://github.com/kevinvane/tiny-timetable.git
+cd tiny-timetable
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
 npm run dev
 ```
 
-### 构建生产版本
+浏览器访问 http://localhost:5173
+
+### 构建 & 部署
+
 ```bash
+# 构建生产版本
 npm run build
+
+# 本地预览构建产物
+npm run preview
 ```
 
-### 预览生产版本
-```npm run preview
-```
+构建产物输出到 `dist/` 目录，可直接部署到任意静态托管服务（Nginx、Vercel、Netlify、GitHub Pages 等）。
 
-## 开发脚本
+## 📝 开发脚本
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview"
-  }
-}
-```
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 启动开发服务器 |
+| `npm run build` | TypeScript 类型检查 + 生产构建 |
+| `npm run preview` | 本地预览构建产物 |
 
-## 浏览器兼容性
+## 🌐 浏览器兼容性
 
-- Chrome >= 87
-- Firefox >= 78
-- Safari >= 14
-- Edge >= 88
+| 浏览器 | 最低版本 |
+|--------|----------|
+| Chrome | 87+ |
+| Firefox | 78+ |
+| Safari | 14+ |
+| Edge | 88+ |
 
-## 许可证
+## 📄 License
 
-本项目使用 MIT 许可证。
+[Apache License 2.0](LICENSE)
