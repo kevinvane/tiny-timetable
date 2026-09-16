@@ -103,7 +103,7 @@ const navigateToCourses = () => {
 .welcome-section {
   text-align: center;
   padding: 40px 0;
-  background: linear-gradient(135deg, var(--primary-color), #67C23A);
+  background: linear-gradient(135deg, var(--primary-color), var(--warning-color));
   border-radius: 12px;
   color: white;
   margin-bottom: 30px;

@@ -15,16 +15,16 @@ export const DEFAULT_TIME_SLOTS: TimeSlot[] = [
   { id: '8', name: '第七节', startTime: '16:00', endTime: '16:45', type: 'class' },
 ]
 
-// 课程颜色映射
+// 课程颜色映射 - 温暖活泼配色
 export const COURSE_COLORS: CourseColorMap = {
-  chinese: '#409EFF',    // 语文 - 蓝色
-  math: '#67C23A',       // 数学 - 绿色
-  english: '#E6A23C',    // 英语 - 橙色
-  pe: '#F56C6C',         // 体育 - 红色
-  music: '#909399',      // 音乐 - 灰色
-  art: '#B37FEB',        // 美术 - 紫色
-  science: '#36CFC9',    // 科学 - 青色
-  moral: '#FF85C0',      // 品德 - 粉色
+  chinese: '#FF7043',    // 语文 - 珊瑚橙
+  math: '#66BB6A',       // 数学 - 清新绿
+  english: '#42A5F5',    // 英语 - 天空蓝
+  pe: '#EF5350',         // 体育 - 活力红
+  music: '#AB47BC',      // 音乐 - 梦幻紫
+  art: '#26C6DA',        // 美术 - 清凉青
+  science: '#FFA726',    // 科学 - 阳光橙
+  moral: '#EC407A',      // 品德 - 甜蜜粉
 }
 
 // 课程分类名称
