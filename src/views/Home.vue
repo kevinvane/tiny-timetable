@@ -158,6 +158,8 @@ const navigateToCourses = () => {
   cursor: pointer;
   text-align: center;
   transition: transform 0.3s;
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
 }
 
 .action-card:hover {
