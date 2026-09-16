@@ -121,4 +121,15 @@ const toggleTheme = () => {
   padding: 20px;
   background-color: var(--bg-primary);
 }
+
+@media print {
+  .sidebar {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+}
 </style>

@@ -5,10 +5,12 @@ interface Props {
   course: Course
   scheduleItem?: ScheduleItem
   showActions?: boolean
+  compact?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showActions: false
+  showActions: false,
+  compact: false
 })
 
 const emit = defineEmits<{
@@ -34,19 +36,21 @@ const emit = defineEmits<{
       </div>
     </div>
     
-    <div v-if="scheduleItem" class="course-time">
-      {{ scheduleItem.startTime }} - {{ scheduleItem.endTime }}
-    </div>
-    
-    <div v-if="course.teacher" class="course-teacher">
-      <el-icon><User /></el-icon>
-      {{ course.teacher }}
-    </div>
-    
-    <div v-if="course.classroom" class="course-classroom">
-      <el-icon><Location /></el-icon>
-      {{ course.classroom }}
-    </div>
+    <template v-if="!compact">
+      <div v-if="scheduleItem" class="course-time">
+        {{ scheduleItem.startTime }} - {{ scheduleItem.endTime }}
+      </div>
+      
+      <div v-if="course.teacher" class="course-teacher">
+        <el-icon><User /></el-icon>
+        {{ course.teacher }}
+      </div>
+      
+      <div v-if="course.classroom" class="course-classroom">
+        <el-icon><Location /></el-icon>
+        {{ course.classroom }}
+      </div>
+    </template>
   </div>
 </template>
 

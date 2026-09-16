@@ -15,7 +15,6 @@ const {
   setDay
 } = useSchedule()
 
-// 从路由参数初始化视图
 const initView = () => {
   const viewParam = route.params.view as string
   if (viewParam === 'day') {
@@ -27,25 +26,31 @@ const initView = () => {
 
 initView()
 
-// 切换视图
 const handleViewChange = (view: ViewType) => {
   setView(view)
   router.replace(`/schedule/${view}`)
 }
 
-// 切换日期
 const handleDayChange = (day: DayOfWeek) => {
   setDay(day)
+}
+
+const handlePrint = () => {
+  window.print()
 }
 </script>
 
 <template>
   <div class="schedule-page">
     <!-- 页面头部 -->
-    <div class="page-header">
+    <div class="page-header no-print">
       <h1>课程表</h1>
       
       <div class="header-actions">
+        <el-button @click="handlePrint">
+          <el-icon><Printer /></el-icon>
+          打印课程表
+        </el-button>
         <el-button-group>
           <el-button 
             :type="currentView === 'week' ? 'primary' : ''"
@@ -65,8 +70,13 @@ const handleDayChange = (day: DayOfWeek) => {
       </div>
     </div>
 
+    <!-- 打印标题 -->
+    <div class="print-title print-only">
+      <h1>小学生课程表</h1>
+    </div>
+
     <!-- 日视图时的日期选择 -->
-    <div v-if="currentView === 'day'" class="day-selector">
+    <div v-if="currentView === 'day'" class="day-selector no-print">
       <el-button 
         v-for="day in 5" 
         :key="day"
@@ -101,10 +111,37 @@ const handleDayChange = (day: DayOfWeek) => {
   margin: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .day-selector {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+}
+
+.print-title {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .print-title h1 {
+    font-size: 22px;
+    margin: 0;
+  }
 }
 </style>

@@ -119,6 +119,7 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
             <CourseCard 
               :course="getCourseAtSlot(day as DayOfWeek, slotIndex)!.course!"
               :schedule-item="getCourseAtSlot(day as DayOfWeek, slotIndex)"
+              compact
             />
             <el-button 
               class="delete-btn" 
@@ -166,6 +167,7 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
               <CourseCard 
                 :course="getCourseAtSlot(currentDay, slotIndex)!.course!"
                 :schedule-item="getCourseAtSlot(currentDay, slotIndex)"
+                compact
               />
               <el-button 
                 class="delete-btn" 
@@ -354,5 +356,48 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
 
 .slot-content {
   flex: 1;
+}
+
+@media print {
+  .schedule-grid {
+    border: 1px solid #000;
+  }
+
+  .header-row .day-column.is-today {
+    background: #ccc !important;
+    color: #000 !important;
+  }
+
+  .schedule-row .day-column.is-today {
+    background: none !important;
+  }
+
+  .time-column {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header-row {
+    background: #e0e0e0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .course-slot {
+    position: relative;
+  }
+
+  .delete-btn {
+    display: none !important;
+  }
+
+  .empty-slot {
+    border: 1px dashed #ccc;
+  }
+
+  .empty-slot .el-icon {
+    display: none;
+  }
 }
 </style>
