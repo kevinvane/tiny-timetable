@@ -42,10 +42,32 @@ export interface Reminder {
   isEnabled: boolean
 }
 
+// 主题色值
+export interface ThemeColors {
+  primary: string
+  primaryLight: string
+  primaryDark: string
+  success: string
+  warning: string
+  danger: string
+  bgPrimary: string
+  bgSecondary: string
+  textPrimary: string
+  textSecondary: string
+  borderColor: string
+}
+
+// 主题
+export interface Theme {
+  id: string
+  name: string
+  colors: ThemeColors
+}
+
 // 设置
 export interface Settings {
   title: string
-  theme: 'light' | 'dark'
+  themeId: string
   fontSize: 'small' | 'medium' | 'large'
   reminders: Reminder[]
   timeSlots: TimeSlot[]

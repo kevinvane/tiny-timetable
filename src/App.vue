@@ -24,12 +24,12 @@ const toggleCollapse = () => {
 }
 
 const toggleTheme = () => {
-  settingsStore.toggleTheme()
+  settingsStore.toggleDark()
 }
 </script>
 
 <template>
-  <div class="app-container" :data-theme="settingsStore.theme">
+  <div class="app-container">
     <!-- 侧边栏导航 -->
     <aside class="sidebar" :class="{ collapsed }">
       <div class="logo">
@@ -44,7 +44,7 @@ const toggleTheme = () => {
           </el-button>
           <el-button class="theme-toggle" @click="toggleTheme" circle>
             <el-icon>
-              <Sunny v-if="settingsStore.theme === 'dark'" />
+              <Sunny v-if="settingsStore.isDark" />
               <Moon v-else />
             </el-icon>
           </el-button>

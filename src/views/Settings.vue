@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useSettingsStore } from '@/stores'
+import { THEMES } from '@/constants/themes'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { TimeSlot } from '@/types'
 
@@ -16,10 +17,15 @@ const handleTitleChange = () => {
   }
 }
 
-// 主题设置
-const handleThemeChange = (theme: 'light' | 'dark') => {
-  settingsStore.setTheme(theme)
-  ElMessage.success('主题已更新')
+// 主题切换
+const handleThemeSelect = (id: string) => {
+  settingsStore.setThemeId(id)
+  ElMessage.success('主题已切换')
+}
+
+const handleDarkToggle = () => {
+  settingsStore.toggleDark()
+  ElMessage.success(settingsStore.isDark ? '已切换到深色模式' : '已切换到浅色模式')
 }
 
 // 字体大小设置
@@ -105,21 +111,35 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
         </div>
 
         <div class="setting-section">
-          <h3>主题</h3>
-          <p class="setting-desc">选择你喜欢的主题模式</p>
-          <el-radio-group 
-            :model-value="settingsStore.theme" 
-            @change="handleThemeChange"
-          >
-            <el-radio-button value="light">
-              <el-icon><Sunny /></el-icon>
-              浅色模式
-            </el-radio-button>
-            <el-radio-button value="dark">
-              <el-icon><Moon /></el-icon>
-              深色模式
-            </el-radio-button>
-          </el-radio-group>
+          <h3>主题配色</h3>
+          <p class="setting-desc">选择你喜欢的主题颜色</p>
+          <div class="theme-grid">
+            <div
+              v-for="theme in THEMES"
+              :key="theme.id"
+              class="theme-card"
+              :class="{ active: settingsStore.themeId === theme.id }"
+              @click="handleThemeSelect(theme.id)"
+            >
+              <div class="theme-colors">
+                <span class="color-dot" :style="{ backgroundColor: theme.colors.primary }"></span>
+                <span class="color-dot" :style="{ backgroundColor: theme.colors.success }"></span>
+                <span class="color-dot" :style="{ backgroundColor: theme.colors.warning }"></span>
+              </div>
+              <span class="theme-name">{{ theme.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <h3>深色模式</h3>
+          <p class="setting-desc">切换浅色/深色显示模式</p>
+          <el-switch 
+            :model-value="settingsStore.isDark"
+            @change="handleDarkToggle"
+            active-text="深色"
+            inactive-text="浅色"
+          />
         </div>
         
         <div class="setting-section">
@@ -307,6 +327,52 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
 
 .title-input-row .el-input {
   flex: 1;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.theme-card.active {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+}
+
+.theme-colors {
+  display: flex;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-name {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .about-info {
