@@ -7,6 +7,7 @@ import { DEFAULT_TIME_SLOTS } from '@/constants'
 const STORAGE_KEY = 'schedule-settings'
 
 const defaultSettings: Settings = {
+  title: '小学生课程表',
   theme: 'light',
   fontSize: 'medium',
   reminders: [],
@@ -15,13 +16,24 @@ const defaultSettings: Settings = {
 
 export const useSettingsStore = defineStore('settings', () => {
   // 状态
-  const settings = ref<Settings>(getStorage<Settings>(STORAGE_KEY, defaultSettings))
+  const settings = ref<Settings>({
+    ...defaultSettings,
+    ...getStorage<Settings>(STORAGE_KEY, defaultSettings)
+  })
 
   // 计算属性
+  const title = computed(() => settings.value.title)
   const theme = computed(() => settings.value.theme)
   const fontSize = computed(() => settings.value.fontSize)
   const timeSlots = computed(() => settings.value.timeSlots)
   const reminders = computed(() => settings.value.reminders)
+
+  // 标题
+  const setTitle = (newTitle: string) => {
+    settings.value.title = newTitle
+    document.title = `${newTitle}`
+    saveSettings()
+  }
 
   // 主题相关
   const setTheme = (theme: 'light' | 'dark') => {
@@ -131,10 +143,12 @@ export const useSettingsStore = defineStore('settings', () => {
 
   return {
     settings,
+    title,
     theme,
     fontSize,
     timeSlots,
     reminders,
+    setTitle,
     setTheme,
     toggleTheme,
     setFontSize,

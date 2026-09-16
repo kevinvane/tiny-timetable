@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { useSchedule } from '@/composables'
+import { useSettingsStore } from '@/stores'
 import { DAY_NAMES } from '@/constants'
 import ScheduleGrid from '@/components/schedule/ScheduleGrid.vue'
 import type { DayOfWeek, ViewType } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
+const settingsStore = useSettingsStore()
 
 const { 
   currentView, 
@@ -44,7 +46,7 @@ const handlePrint = () => {
   <div class="schedule-page">
     <!-- 页面头部 -->
     <div class="page-header no-print">
-      <h1>课程表</h1>
+      <h1>{{ settingsStore.title }}</h1>
       
       <div class="header-actions">
         <el-button @click="handlePrint">
@@ -72,7 +74,7 @@ const handlePrint = () => {
 
     <!-- 打印标题 -->
     <div class="print-title print-only">
-      <h1>小学生课程表</h1>
+      <h1>{{ settingsStore.title }}</h1>
     </div>
 
     <!-- 日视图时的日期选择 -->

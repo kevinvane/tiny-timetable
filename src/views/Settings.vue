@@ -7,6 +7,14 @@ import type { TimeSlot } from '@/types'
 const settingsStore = useSettingsStore()
 
 const activeTab = ref('appearance')
+const titleInput = ref(settingsStore.title)
+
+const handleTitleChange = () => {
+  if (titleInput.value.trim()) {
+    settingsStore.setTitle(titleInput.value.trim())
+    ElMessage.success('标题已更新')
+  }
+}
 
 // 主题设置
 const handleThemeChange = (theme: 'light' | 'dark') => {
@@ -80,6 +88,22 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
     <el-tabs v-model="activeTab">
       <!-- 外观设置 -->
       <el-tab-pane label="外观" name="appearance">
+        <div class="setting-section">
+          <h3>应用标题</h3>
+          <p class="setting-desc">自定义显示在侧边栏的名称</p>
+          <div class="title-input-row">
+            <el-input 
+              v-model="titleInput" 
+              placeholder="请输入标题"
+              maxlength="20"
+              show-word-limit
+              @blur="handleTitleChange"
+              @keyup.enter="handleTitleChange"
+            />
+            <el-button type="primary" @click="handleTitleChange">保存</el-button>
+          </div>
+        </div>
+
         <div class="setting-section">
           <h3>主题</h3>
           <p class="setting-desc">选择你喜欢的主题模式</p>
@@ -274,6 +298,15 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
 .data-actions {
   display: flex;
   gap: 12px;
+}
+
+.title-input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.title-input-row .el-input {
+  flex: 1;
 }
 
 .about-info {

@@ -28,7 +28,7 @@ const toggleTheme = () => {
     <aside class="sidebar">
       <div class="logo">
         <el-icon :size="24"><Calendar /></el-icon>
-        <span>课程表</span>
+        <span>{{ settingsStore.title }}</span>
         <el-button class="theme-toggle" @click="toggleTheme" circle>
           <el-icon>
             <Sunny v-if="settingsStore.theme === 'dark'" />

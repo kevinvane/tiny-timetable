@@ -2,12 +2,13 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSchedule } from '@/composables'
-import { useCourseStore } from '@/stores'
+import { useCourseStore, useSettingsStore } from '@/stores'
 import CourseCard from '@/components/course/CourseCard.vue'
 
 const router = useRouter()
 const { todaySchedule, getDayName, today } = useSchedule()
 const courseStore = useCourseStore()
+const settingsStore = useSettingsStore()
 
 const todayName = getDayName(today as any)
 
@@ -26,7 +27,7 @@ const navigateToCourses = () => {
   <div class="home-page">
     <!-- 欢迎区域 -->
     <div class="welcome-section">
-      <h1>欢迎使用小学生课程表</h1>
+      <h1>欢迎使用{{ settingsStore.title }}</h1>
       <p>轻松管理你的课程安排</p>
     </div>
 

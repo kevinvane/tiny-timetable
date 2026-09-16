@@ -44,6 +44,7 @@ export interface Reminder {
 
 // 设置
 export interface Settings {
+  title: string
   theme: 'light' | 'dark'
   fontSize: 'small' | 'medium' | 'large'
   reminders: Reminder[]
