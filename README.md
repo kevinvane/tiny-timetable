@@ -14,6 +14,12 @@
 
 ---
 
+## 🌐 在线预览
+
+**GitHub Pages**：https://kevinvane.github.io/tiny-timetable/
+
+---
+
 ## ✨ 功能特性
 
 ### 📅 课程表管理
