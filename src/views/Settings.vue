@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useSettingsStore } from '@/stores'
+import { useSettingsStore, useCourseStore } from '@/stores'
 import { THEMES } from '@/constants/themes'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { TimeSlot } from '@/types'
+import type { TimeSlot, Reminder } from '@/types'
+import { getStorage, setStorage, removeStorage } from '@/utils'
 
 const settingsStore = useSettingsStore()
+const courseStore = useCourseStore()
 
 const activeTab = ref('appearance')
 const titleInput = ref(settingsStore.title)
@@ -85,12 +87,140 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
     // 取消
   }
 }
+
+// 提醒管理
+const showReminderDialog = ref(false)
+const editingReminder = ref<Reminder | null>(null)
+const reminderForm = ref({
+  courseId: '',
+  type: 'before_class' as Reminder['type'],
+  advanceMinutes: 5,
+  isEnabled: true
+})
+
+const reminderTypeNames: Record<string, string> = {
+  before_class: '课前提醒',
+  homework: '作业提醒',
+  custom: '自定义'
+}
+
+const openAddReminder = () => {
+  editingReminder.value = null
+  reminderForm.value = { courseId: '', type: 'before_class', advanceMinutes: 5, isEnabled: true }
+  showReminderDialog.value = true
+}
+
+const openEditReminder = (reminder: Reminder) => {
+  editingReminder.value = reminder
+  reminderForm.value = {
+    courseId: reminder.courseId,
+    type: reminder.type,
+    advanceMinutes: reminder.advanceMinutes,
+    isEnabled: reminder.isEnabled
+  }
+  showReminderDialog.value = true
+}
+
+const handleSaveReminder = () => {
+  if (!reminderForm.value.courseId) {
+    ElMessage.warning('请选择课程')
+    return
+  }
+  if (editingReminder.value) {
+    settingsStore.updateReminder(editingReminder.value.id, { ...reminderForm.value })
+    ElMessage.success('修改成功')
+  } else {
+    settingsStore.addReminder({ ...reminderForm.value })
+    ElMessage.success('添加成功')
+  }
+  showReminderDialog.value = false
+}
+
+const handleDeleteReminder = async (reminder: Reminder) => {
+  try {
+    await ElMessageBox.confirm('确定要删除此提醒吗？', '删除确认', { type: 'warning' })
+    settingsStore.deleteReminder(reminder.id)
+    ElMessage.success('删除成功')
+  } catch {
+    // 取消
+  }
+}
+
+const getReminderCourseName = (courseId: string) => {
+  const course = courseStore.getCourseById(courseId)
+  return course ? course.name : '未知课程'
+}
+
+// 数据管理
+const handleExportData = () => {
+  const data = {
+    courses: getStorage('schedule-courses', []),
+    scheduleItems: getStorage('schedule-items', []),
+    settings: getStorage('schedule-settings', {}),
+  }
+  const json = JSON.stringify(data, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `课程表数据_${new Date().toISOString().slice(0, 10)}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+  ElMessage.success('数据已导出')
+}
+
+const importInputRef = ref<HTMLInputElement | null>(null)
+
+const handleImportData = () => {
+  importInputRef.value?.click()
+}
+
+const handleImportFile = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target?.result as string)
+      if (data.courses) setStorage('schedule-courses', data.courses)
+      if (data.scheduleItems) setStorage('schedule-items', data.scheduleItems)
+      if (data.settings) setStorage('schedule-settings', data.settings)
+      ElMessage.success('数据已导入，即将刷新页面')
+      setTimeout(() => window.location.reload(), 1000)
+    } catch {
+      ElMessage.error('导入失败：文件格式无效')
+    }
+  }
+  reader.readAsText(file)
+  // 重置 input 以便可以重复导入同一文件
+  target.value = ''
+}
+
+const handleClearData = async () => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要清除所有数据吗？此操作不可恢复！',
+      '危险操作',
+      { type: 'error', confirmButtonText: '确认清除', cancelButtonText: '取消' }
+    )
+    removeStorage('schedule-courses')
+    removeStorage('schedule-items')
+    removeStorage('schedule-settings')
+    removeStorage('schedule-dark')
+    ElMessage.success('所有数据已清除，即将刷新页面')
+    setTimeout(() => window.location.reload(), 1000)
+  } catch {
+    // 取消
+  }
+}
 </script>
 
 <template>
   <div class="settings-page">
     <h1>设置</h1>
-    
+
     <el-tabs v-model="activeTab">
       <!-- 外观设置 -->
       <el-tab-pane label="外观" name="appearance">
@@ -98,8 +228,8 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
           <h3>应用标题</h3>
           <p class="setting-desc">自定义显示在侧边栏的名称</p>
           <div class="title-input-row">
-            <el-input 
-              v-model="titleInput" 
+            <el-input
+              v-model="titleInput"
               placeholder="请输入标题"
               maxlength="20"
               show-word-limit
@@ -134,19 +264,19 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
         <div class="setting-section">
           <h3>深色模式</h3>
           <p class="setting-desc">切换浅色/深色显示模式</p>
-          <el-switch 
+          <el-switch
             :model-value="settingsStore.isDark"
             @change="handleDarkToggle"
             active-text="深色"
             inactive-text="浅色"
           />
         </div>
-        
+
         <div class="setting-section">
           <h3>字体大小</h3>
           <p class="setting-desc">调整应用中的字体大小</p>
-          <el-radio-group 
-            :model-value="settingsStore.fontSize" 
+          <el-radio-group
+            :model-value="settingsStore.fontSize"
             @change="handleFontSizeChange"
           >
             <el-radio-button value="small">小</el-radio-button>
@@ -169,7 +299,7 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
               添加时段
             </el-button>
           </div>
-          
+
           <el-table :data="settingsStore.timeSlots" style="width: 100%">
             <el-table-column prop="name" label="时段名称" />
             <el-table-column prop="startTime" label="开始时间" />
@@ -194,12 +324,45 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
       <!-- 提醒设置 -->
       <el-tab-pane label="提醒" name="reminder">
         <div class="setting-section">
-          <h3>课程提醒</h3>
-          <p class="setting-desc">设置课程开始前的提醒时间</p>
-          
-          <el-empty description="暂无提醒设置">
-            <el-button type="primary">添加提醒</el-button>
-          </el-empty>
+          <div class="section-header">
+            <div>
+              <h3>课程提醒</h3>
+              <p class="setting-desc">设置课程开始前的提醒时间</p>
+            </div>
+            <el-button type="primary" @click="openAddReminder">
+              <el-icon><Plus /></el-icon>
+              添加提醒
+            </el-button>
+          </div>
+
+          <el-table v-if="settingsStore.reminders.length > 0" :data="settingsStore.reminders" style="width: 100%">
+            <el-table-column label="课程" min-width="120">
+              <template #default="{ row }">
+                {{ getReminderCourseName(row.courseId) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="类型" width="120">
+              <template #default="{ row }">
+                {{ reminderTypeNames[row.type] || row.type }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="advanceMinutes" label="提前分钟" width="120" />
+            <el-table-column label="状态" width="100">
+              <template #default="{ row }">
+                <el-tag :type="row.isEnabled ? 'success' : 'info'">
+                  {{ row.isEnabled ? '已启用' : '已禁用' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="140" fixed="right">
+              <template #default="{ row }">
+                <el-button size="small" @click="openEditReminder(row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="handleDeleteReminder(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <el-empty v-else description="暂无提醒设置" />
         </div>
       </el-tab-pane>
 
@@ -208,20 +371,27 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
         <div class="setting-section">
           <h3>数据管理</h3>
           <p class="setting-desc">管理你的课程表数据</p>
-          
+
           <div class="data-actions">
-            <el-button type="primary">
+            <el-button type="primary" @click="handleExportData">
               <el-icon><Download /></el-icon>
               导出数据
             </el-button>
-            <el-button>
+            <el-button @click="handleImportData">
               <el-icon><Upload /></el-icon>
               导入数据
             </el-button>
-            <el-button type="danger">
+            <el-button type="danger" @click="handleClearData">
               <el-icon><Delete /></el-icon>
               清除所有数据
             </el-button>
+            <input
+              ref="importInputRef"
+              type="file"
+              accept=".json"
+              style="display: none"
+              @change="handleImportFile"
+            />
           </div>
         </div>
       </el-tab-pane>
@@ -231,7 +401,7 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
         <div class="setting-section">
           <h3>关于应用</h3>
           <p class="setting-desc">小学生课程表 v1.0.0</p>
-          
+
           <div class="about-info">
             <p>这是一个为小学生设计的课程表管理应用，帮助你轻松管理课程安排。</p>
             <p>技术栈：Vue 3 + Vite + TypeScript + Element Plus</p>
@@ -267,6 +437,43 @@ const handleDeleteSlot = async (slot: TimeSlot) => {
       <template #footer>
         <el-button @click="showSlotDialog = false">取消</el-button>
         <el-button type="primary" @click="handleSaveSlot">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑/添加提醒弹窗 -->
+    <el-dialog
+      v-model="showReminderDialog"
+      :title="editingReminder ? '编辑提醒' : '添加提醒'"
+      width="400px"
+    >
+      <el-form :model="reminderForm" label-width="80px">
+        <el-form-item label="选择课程">
+          <el-select v-model="reminderForm.courseId" placeholder="请选择课程" style="width: 100%">
+            <el-option
+              v-for="course in courseStore.courseList"
+              :key="course.id"
+              :label="course.name"
+              :value="course.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="提醒类型">
+          <el-select v-model="reminderForm.type" style="width: 100%">
+            <el-option label="课前提醒" value="before_class" />
+            <el-option label="作业提醒" value="homework" />
+            <el-option label="自定义" value="custom" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="提前分钟">
+          <el-input-number v-model="reminderForm.advanceMinutes" :min="1" :max="120" />
+        </el-form-item>
+        <el-form-item label="启用">
+          <el-switch v-model="reminderForm.isEnabled" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showReminderDialog = false">取消</el-button>
+        <el-button type="primary" @click="handleSaveReminder">确定</el-button>
       </template>
     </el-dialog>
   </div>

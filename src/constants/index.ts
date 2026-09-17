@@ -37,12 +37,12 @@ export const CATEGORY_NAMES: Record<string, string> = {
 
 // 默认课程列表
 export const DEFAULT_COURSES = [
-  { id: '1', name: '语文', teacher: '', classroom: '', color: COURSE_COLORS.chinese, category: 'main' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '2', name: '数学', teacher: '', classroom: '', color: COURSE_COLORS.math, category: 'main' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '3', name: '英语', teacher: '', classroom: '', color: COURSE_COLORS.english, category: 'main' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '4', name: '体育', teacher: '', classroom: '', color: COURSE_COLORS.pe, category: 'secondary' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '5', name: '音乐', teacher: '', classroom: '', color: COURSE_COLORS.music, category: 'secondary' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '6', name: '美术', teacher: '', classroom: '', color: COURSE_COLORS.art, category: 'secondary' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '7', name: '科学', teacher: '', classroom: '', color: COURSE_COLORS.science, category: 'secondary' as const, createdAt: new Date(), updatedAt: new Date() },
-  { id: '8', name: '品德', teacher: '', classroom: '', color: COURSE_COLORS.moral, category: 'secondary' as const, createdAt: new Date(), updatedAt: new Date() },
+  { id: '1', name: '语文', teacher: '', classroom: '', color: COURSE_COLORS.chinese, category: 'main' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '2', name: '数学', teacher: '', classroom: '', color: COURSE_COLORS.math, category: 'main' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '3', name: '英语', teacher: '', classroom: '', color: COURSE_COLORS.english, category: 'main' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '4', name: '体育', teacher: '', classroom: '', color: COURSE_COLORS.pe, category: 'secondary' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '5', name: '音乐', teacher: '', classroom: '', color: COURSE_COLORS.music, category: 'secondary' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '6', name: '美术', teacher: '', classroom: '', color: COURSE_COLORS.art, category: 'secondary' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '7', name: '科学', teacher: '', classroom: '', color: COURSE_COLORS.science, category: 'secondary' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '8', name: '品德', teacher: '', classroom: '', color: COURSE_COLORS.moral, category: 'secondary' as const, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ]

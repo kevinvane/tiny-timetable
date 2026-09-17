@@ -6,8 +6,8 @@ export interface Course {
   classroom: string
   color: string
   category: CourseCategory
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string // ISO 8601 格式，避免 localStorage 序列化后类型不一致
+  updatedAt: string
 }
 
 // 课程分类

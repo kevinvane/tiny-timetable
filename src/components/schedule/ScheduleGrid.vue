@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useSchedule } from '@/composables'
-import { useScheduleStore, useCourseStore } from '@/stores'
-import { DAY_NAMES, DEFAULT_TIME_SLOTS } from '@/constants'
+import { useScheduleStore, useCourseStore, useSettingsStore } from '@/stores'
+import { DAY_NAMES } from '@/constants'
 import CourseCard from '@/components/course/CourseCard.vue'
 import type { DayOfWeek, ScheduleItem } from '@/types'
 import { ElMessage } from 'element-plus'
 
-const { 
-  currentView, 
-  currentDay, 
-  isToday, 
+const {
+  currentView,
+  currentDay,
+  isToday,
   getDaySchedule,
   setDay,
   setView
@@ -18,22 +18,28 @@ const {
 
 const scheduleStore = useScheduleStore()
 const courseStore = useCourseStore()
+const settingsStore = useSettingsStore()
 
 // 添加课程弹窗
 const showAddDialog = ref(false)
 const addForm = ref<{ courseId: string }>({ courseId: '' })
 const addingSlot = ref<{ day: DayOfWeek; timeSlotIndex: number } | null>(null)
 
-// 只显示上课时间段
+// 使用用户自定义时间段，fallback 到默认值
 const classTimeSlots = computed(() => {
-  return DEFAULT_TIME_SLOTS.filter(slot => slot.type === 'class')
+  const slots = settingsStore.timeSlots.length > 0
+    ? settingsStore.timeSlots
+    : []
+  const allSlots = slots.length > 0 ? slots : []
+  return allSlots.filter(slot => slot.type === 'class')
 })
 
 // 获取某天某时间段的课程（按 startTime 匹配）
 const getCourseAtSlot = (day: DayOfWeek, slotIndex: number) => {
   const daySchedule = getDaySchedule(day)
   const slot = classTimeSlots.value[slotIndex]
-  return daySchedule.find(item => item.startTime === slot.startTime)
+  if (!slot) return null
+  return daySchedule.find(item => item.startTime === slot.startTime) ?? null
 }
 
 // 打开添加课程弹窗
@@ -51,7 +57,11 @@ const confirmAddCourse = () => {
   }
 
   const slot = classTimeSlots.value[addingSlot.value.timeSlotIndex]
-  
+  if (!slot) {
+    ElMessage.warning('时间段无效')
+    return
+  }
+
   // 检查是否已有课程
   const existing = getCourseAtSlot(addingSlot.value.day, addingSlot.value.timeSlotIndex)
   if (existing) {
@@ -85,8 +95,8 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
     <div v-if="currentView === 'week'" class="week-view">
       <div class="header-row">
         <div class="time-column">时间</div>
-        <div 
-          v-for="day in 5" 
+        <div
+          v-for="day in 5"
           :key="day"
           class="day-column"
           :class="{ 'is-today': isToday(day as DayOfWeek) }"
@@ -95,9 +105,9 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
           {{ DAY_NAMES[day - 1] }}
         </div>
       </div>
-      
-      <div 
-        v-for="(slot, slotIndex) in classTimeSlots" 
+
+      <div
+        v-for="(slot, slotIndex) in classTimeSlots"
         :key="slot.id"
         class="schedule-row"
       >
@@ -105,34 +115,33 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
           <div class="slot-name">{{ slot.name }}</div>
           <div class="slot-time">{{ slot.startTime }}-{{ slot.endTime }}</div>
         </div>
-        
-        <div 
-          v-for="day in 5" 
+
+        <div
+          v-for="day in 5"
           :key="`${day}-${slot.id}`"
           class="day-column"
           :class="{ 'is-today': isToday(day as DayOfWeek) }"
         >
-          <div 
-            v-if="getCourseAtSlot(day as DayOfWeek, slotIndex)"
-            class="course-slot"
-          >
-            <CourseCard 
-              :course="getCourseAtSlot(day as DayOfWeek, slotIndex)!.course!"
-              :schedule-item="getCourseAtSlot(day as DayOfWeek, slotIndex)"
-              compact
-            />
-            <el-button 
-              class="delete-btn" 
-              size="small" 
-              circle 
-              type="danger"
-              @click.stop="handleDeleteScheduleItem(getCourseAtSlot(day as DayOfWeek, slotIndex)!)"
-            >
-              <el-icon><Close /></el-icon>
-            </el-button>
-          </div>
-          <div 
-            v-else 
+          <template v-if="getCourseAtSlot(day as DayOfWeek, slotIndex)">
+            <div class="course-slot">
+              <CourseCard
+                :course="getCourseAtSlot(day as DayOfWeek, slotIndex)!.course!"
+                :schedule-item="getCourseAtSlot(day as DayOfWeek, slotIndex)!"
+                compact
+              />
+              <el-button
+                class="delete-btn"
+                size="small"
+                circle
+                type="danger"
+                @click.stop="handleDeleteScheduleItem(getCourseAtSlot(day as DayOfWeek, slotIndex)!)"
+              >
+                <el-icon><Close /></el-icon>
+              </el-button>
+            </div>
+          </template>
+          <div
+            v-else
             class="empty-slot"
             @click="addCourseToSlot(day as DayOfWeek, slotIndex)"
           >
@@ -141,16 +150,16 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
         </div>
       </div>
     </div>
-    
+
     <!-- 日视图 -->
     <div v-else class="day-view">
       <div class="day-header">
         {{ DAY_NAMES[currentDay - 1] }}
       </div>
-      
+
       <div class="day-schedule">
-        <div 
-          v-for="(slot, slotIndex) in classTimeSlots" 
+        <div
+          v-for="(slot, slotIndex) in classTimeSlots"
           :key="slot.id"
           class="time-slot"
         >
@@ -158,29 +167,28 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
             <div class="slot-name">{{ slot.name }}</div>
             <div class="slot-time">{{ slot.startTime }}-{{ slot.endTime }}</div>
           </div>
-          
+
           <div class="slot-content">
-            <div 
-              v-if="getCourseAtSlot(currentDay, slotIndex)"
-              class="course-slot"
-            >
-              <CourseCard 
-                :course="getCourseAtSlot(currentDay, slotIndex)!.course!"
-                :schedule-item="getCourseAtSlot(currentDay, slotIndex)"
-                compact
-              />
-              <el-button 
-                class="delete-btn" 
-                size="small" 
-                circle 
-                type="danger"
-                @click.stop="handleDeleteScheduleItem(getCourseAtSlot(currentDay, slotIndex)!)"
-              >
-                <el-icon><Close /></el-icon>
-              </el-button>
-            </div>
-            <div 
-              v-else 
+            <template v-if="getCourseAtSlot(currentDay, slotIndex)">
+              <div class="course-slot">
+                <CourseCard
+                  :course="getCourseAtSlot(currentDay, slotIndex)!.course!"
+                  :schedule-item="getCourseAtSlot(currentDay, slotIndex)!"
+                  compact
+                />
+                <el-button
+                  class="delete-btn"
+                  size="small"
+                  circle
+                  type="danger"
+                  @click.stop="handleDeleteScheduleItem(getCourseAtSlot(currentDay, slotIndex)!)"
+                >
+                  <el-icon><Close /></el-icon>
+                </el-button>
+              </div>
+            </template>
+            <div
+              v-else
               class="empty-slot"
               @click="addCourseToSlot(currentDay, slotIndex)"
             >
@@ -207,7 +215,7 @@ const handleDeleteScheduleItem = (item: ScheduleItem) => {
               :value="course.id"
             >
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span 
+                <span
                   style="width: 12px; height: 12px; border-radius: 2px; display: inline-block;"
                   :style="{ backgroundColor: course.color }"
                 ></span>

@@ -23,7 +23,7 @@ export const useCourseStore = defineStore('course', () => {
 
   // 方法
   const addCourse = (courseData: Omit<Course, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date()
+    const now = new Date().toISOString()
     const newCourse: Course = {
       ...courseData,
       id: generateId(),
@@ -41,7 +41,7 @@ export const useCourseStore = defineStore('course', () => {
       courses.value[index] = {
         ...courses.value[index],
         ...courseData,
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString()
       }
       saveCourses()
       return courses.value[index]

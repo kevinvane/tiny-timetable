@@ -59,7 +59,7 @@ src/
 ├── assets/styles/         # 全局样式 & 主题变量
 ├── components/
 │   ├── course/            # 课程卡片、课程表单
-│   └── schedule/          # 课程表网格、时间轴
+│   └── schedule/          # 课程表网格
 ├── composables/           # 组合式函数
 ├── constants/             # 常量 & 预设主题
 ├── router/                # 路由配置
@@ -73,7 +73,8 @@ src/
 │   ├── Home.vue           # 首页
 │   ├── Schedule.vue       # 课程表页
 │   ├── CourseManage.vue   # 课程管理页
-│   └── Settings.vue       # 设置页
+│   ├── Settings.vue       # 设置页
+│   └── NotFound.vue       # 404 页面
 ├── App.vue                # 根组件 (侧边栏布局)
 └── main.ts                # 入口文件
 ```

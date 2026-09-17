@@ -1,15 +1,13 @@
 import { computed } from 'vue'
-import { useScheduleStore } from '@/stores'
-import { useCourseStore } from '@/stores'
-import { getCurrentDayOfWeek } from '@/utils'
-import { DAY_NAMES } from '@/constants'
+import { useScheduleStore, useCourseStore } from '@/stores'
+import { getCurrentDayOfWeek, getDayName as getDayNameUtil } from '@/utils'
 import type { DayOfWeek } from '@/types'
 
 export const useSchedule = () => {
   const scheduleStore = useScheduleStore()
   const courseStore = useCourseStore()
 
-  const today = getCurrentDayOfWeek()
+  const today = computed(() => getCurrentDayOfWeek() as DayOfWeek)
 
   // 获取某天的课程（包含课程详情）
   const getDaySchedule = (day: DayOfWeek) => {
@@ -25,14 +23,14 @@ export const useSchedule = () => {
 
   // 获取今天的课程
   const todaySchedule = computed(() => {
-    return getDaySchedule(today as DayOfWeek)
+    return getDaySchedule(today.value)
   })
 
   // 获取星期名称
-  const getDayName = (day: DayOfWeek) => DAY_NAMES[day - 1]
+  const getDayName = (day: DayOfWeek) => getDayNameUtil(day)
 
   // 判断是否是今天
-  const isToday = (day: DayOfWeek) => day === today
+  const isToday = (day: DayOfWeek) => day === today.value
 
   // 切换视图
   const setView = (view: 'week' | 'day') => {

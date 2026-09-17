@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 
 // 生成唯一ID
 export const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2)
+  return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
 // 格式化时间
@@ -16,10 +16,10 @@ export const getCurrentDayOfWeek = (): number => {
   return day === 0 ? 7 : day
 }
 
-// 获取星期名称
+// 获取星期名称 (1-7, 周一=1, 周日=7)
 export const getDayName = (day: number): string => {
-  const names = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-  return names[day]
+  const names = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+  return names[day - 1] ?? ''
 }
 
 // 判断是否是今天

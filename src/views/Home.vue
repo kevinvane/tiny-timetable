@@ -2,17 +2,28 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSchedule } from '@/composables'
-import { useCourseStore, useSettingsStore } from '@/stores'
+import { useCourseStore, useSettingsStore, useScheduleStore } from '@/stores'
 import CourseCard from '@/components/course/CourseCard.vue'
+import type { DayOfWeek } from '@/types'
 
 const router = useRouter()
 const { todaySchedule, getDayName, today } = useSchedule()
 const courseStore = useCourseStore()
 const settingsStore = useSettingsStore()
+const scheduleStore = useScheduleStore()
 
-const todayName = getDayName(today as any)
+const todayName = computed(() => getDayName(today.value))
 
 const courseCount = computed(() => courseStore.courseList.length)
+
+// 统计本周课程总数（周一到周五）
+const weeklyCourseCount = computed(() => {
+  let count = 0
+  for (let day = 1; day <= 5; day++) {
+    count += scheduleStore.getItemsByDay(day as DayOfWeek).length
+  }
+  return count
+})
 
 const navigateToSchedule = () => {
   router.push('/schedule')
@@ -39,16 +50,17 @@ const navigateToCourses = () => {
           查看完整课程表
         </el-button>
       </div>
-      
+
       <div v-if="todaySchedule.length > 0" class="today-courses">
-        <CourseCard 
-          v-for="item in todaySchedule" 
-          :key="item.id"
-          :course="item.course!"
-          :schedule-item="item"
-        />
+        <template v-for="item in todaySchedule" :key="item.id">
+          <CourseCard
+            v-if="item.course"
+            :course="item.course"
+            :schedule-item="item"
+          />
+        </template>
       </div>
-      
+
       <div v-else class="empty-state">
         <el-empty description="今天没有课程安排">
           <el-button type="primary" @click="navigateToSchedule">
@@ -62,23 +74,29 @@ const navigateToCourses = () => {
     <div class="section">
       <h2>快捷操作</h2>
       <div class="quick-actions">
-        <el-card class="action-card" shadow="hover" @click="navigateToSchedule">
-          <el-icon :size="40"><Calendar /></el-icon>
-          <h3>课程表</h3>
-          <p>查看和管理课程安排</p>
-        </el-card>
-        
-        <el-card class="action-card" shadow="hover" @click="navigateToCourses">
-          <el-icon :size="40"><Notebook /></el-icon>
-          <h3>课程管理</h3>
-          <p>管理课程信息</p>
-        </el-card>
-        
-        <el-card class="action-card" shadow="hover" @click="router.push('/settings')">
-          <el-icon :size="40"><Setting /></el-icon>
-          <h3>设置</h3>
-          <p>个性化你的课程表</p>
-        </el-card>
+        <div class="action-card-wrapper" @click="navigateToSchedule">
+          <el-card class="action-card" shadow="hover">
+            <el-icon :size="40"><Calendar /></el-icon>
+            <h3>课程表</h3>
+            <p>查看和管理课程安排</p>
+          </el-card>
+        </div>
+
+        <div class="action-card-wrapper" @click="navigateToCourses">
+          <el-card class="action-card" shadow="hover">
+            <el-icon :size="40"><Notebook /></el-icon>
+            <h3>课程管理</h3>
+            <p>管理课程信息</p>
+          </el-card>
+        </div>
+
+        <div class="action-card-wrapper" @click="router.push('/settings')">
+          <el-card class="action-card" shadow="hover">
+            <el-icon :size="40"><Setting /></el-icon>
+            <h3>设置</h3>
+            <p>个性化你的课程表</p>
+          </el-card>
+        </div>
       </div>
     </div>
 
@@ -88,7 +106,7 @@ const navigateToCourses = () => {
       <div class="stats">
         <el-statistic title="课程总数" :value="courseCount" />
         <el-statistic title="今日课程" :value="todaySchedule.length" />
-        <el-statistic title="本周课程" :value="todaySchedule.length * 5" />
+        <el-statistic title="本周课程" :value="weeklyCourseCount" />
       </div>
     </div>
   </div>
@@ -152,6 +170,10 @@ const navigateToCourses = () => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
+}
+
+.action-card-wrapper {
+  cursor: pointer;
 }
 
 .action-card {

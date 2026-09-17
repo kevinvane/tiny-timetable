@@ -67,7 +67,11 @@ const toggleTheme = () => {
 
     <!-- 主内容区 -->
     <main class="main-content" :class="{ collapsed }">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
   </div>
 </template>
